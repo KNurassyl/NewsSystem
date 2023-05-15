@@ -87,11 +87,15 @@ public class NewsController {
         Optional<News> news = newsRepository.findById(id);
         if (news.isPresent()) {
             News updatedNews = news.get();
+            NewsSource source = sourceRepository.findById(newsDetails.getSource().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Source", "id", newsDetails.getSource().getId()));
+            NewsTopic topic = topicRepository.findById(newsDetails.getTopic().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Topic", "id", newsDetails.getTopic().getId()));
             updatedNews.setTitle(newsDetails.getTitle());
             updatedNews.setContent(newsDetails.getContent());
-            updatedNews.setSource(newsDetails.getSource());
-            updatedNews.setTopic(newsDetails.getTopic());
             updatedNews.setPublishedAt(newsDetails.getPublishedAt());
+            updatedNews.setSource(source);
+            updatedNews.setTopic(topic);
             return ResponseEntity.ok(newsRepository.save(updatedNews));
         } else {
             return ResponseEntity.notFound().build();
